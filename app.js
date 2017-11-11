@@ -47,6 +47,8 @@ if ('development' == app.get('env')) {
     app.use(errorHandler());
 }
 
+app.use(require('cors')());
+
 function getDBCredentialsUrl(jsonData) {
     var vcapServices = JSON.parse(jsonData);
     // Pattern match to find the first instance of a Cloudant service in
@@ -427,6 +429,26 @@ app.get('/api/favorites', function(request, response) {
         }
     });
 
+});
+
+app.get('/getMonero',(req,res)=>{
+    console.log('Getting rates');
+    let axios = require('axios');
+    axios.get('https://moneropric.es/fiat.json')
+    .then(response=>{
+        console.dir(response.data);
+        let USD = {};
+        for (const item of response.data){
+            if (item.code === 'USD'){
+                USD = item; 
+                break;
+            }
+        }
+        res.json(USD);
+    })
+    .catch(error=>{
+        res.end('Error:'+error.toString());
+    });
 });
 
 
